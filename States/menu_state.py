@@ -8,6 +8,9 @@ import pygame
 class MenuState(BaseState):
     def __init__(self):
         super().__init__()
+        self.image = pygame.image.load("assets/settings_menu.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (800, 600))
+        self.font = pygame.font.SysFont("Arial", 24)
 
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
@@ -24,5 +27,7 @@ class MenuState(BaseState):
         pass
 
     def draw(self, surface: pygame.Surface):
-        surface.fill((255, 0, 0))
-        self.draw_text(surface, "Du er i hovedmenyen! Trykk SPACE for å starte.", self.font, (255, 255, 255), (250, 250))
+        surface.blit(self.image, (0, 0))
+         
+        
+        self.draw_text(surface, "Welcome! to the game Trykk SPACE for å starte.", self.font, (255, 255, 255), (250, 250))
