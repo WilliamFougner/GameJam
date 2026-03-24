@@ -9,7 +9,7 @@ class MenuState(BaseState):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("assets/settings_menu.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (800, 600))
+        self.image = pygame.transform.scale(self.image, (1000, 600))
         self.font = pygame.font.SysFont("Arial", 24)
 
     def handle_events(self, events : list[pygame.event.Event]):
