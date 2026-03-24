@@ -30,4 +30,4 @@ class MenuState(BaseState):
         surface.blit(self.image, (0, 0))
          
         
-        self.draw_text(surface, "Welcome! to the game Trykk SPACE for å starte.", self.font, (255, 255, 255), (250, 250))
+        self.draw_text(surface, "Welcome! to the game Trykk SPACE for å starte.", self.font, (255, 255, 255), (500, 400))
