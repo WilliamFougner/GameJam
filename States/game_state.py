@@ -9,6 +9,8 @@ import pygame
 class GameState(BaseState):
     def __init__(self):
         super().__init__()
+        self.spillere = []
+        self.fiender  = []
 
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
@@ -20,13 +22,27 @@ class GameState(BaseState):
                 if event.key == pygame.K_ESCAPE:
                     self.next_state = "MENU"
                     self.done = True
+                if event.key == pygame.K_SPACE:
+                    self.spillere.append(Spiller(60, 250))
 
     def update(self, dt: float):
-        pass
+        for soldat in self.spillere:
+            soldat.update(dt)
+        for fiende in self.fiender:
+            fiende.update(dt)
 
     def draw(self, surface: pygame.Surface):
         surface.fill((0, 0, 0))
-        self.draw_text(surface, "Du er i spillet! Trykk ESC for å gå tilbake til hovedmenyen.", self.font, (255, 255, 255), (250, 250))
+        for soldat in self.spillere:
+            soldat.draw(surface)
+        for fiende in self.fiender:
+            fiende.draw(surface)
+        self.draw_text(surface, "SPACE = send soldat | ESC = meny", self.font, (255, 255, 255), (250, 20))
+
+
+# ================================
+# Hjelpeklasser — brukes av GameState
+# ================================
 
 class Spillobjekt():
     def __init__(self, x, y, width, height):
@@ -44,7 +60,7 @@ class Spiller(Spillobjekt):
         self.hp = 3
 
     def update(self, dt):
-        self.x += self.speed  # går mot høyre
+        self.x += self.speed
         self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height // 2, self.width, self.height)
 
     def draw(self, surface):
@@ -58,7 +74,7 @@ class Fiende(Spillobjekt):
         self.hp = 3
 
     def update(self, dt):
-        self.x -= self.speed  # går mot venstre
+        self.x -= self.speed
         self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height // 2, self.width, self.height)
 
     def draw(self, surface):
