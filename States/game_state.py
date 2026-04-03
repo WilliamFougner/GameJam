@@ -11,21 +11,28 @@ class GameState(BaseState):
         super().__init__()
         self.spillere = []
         self.fiender  = []
-        self.knapp = Knapp(700, 0, 50, 50, "assets/soldat.png") #Knapp
+        self.knsoldat1 = Knapp(700, 0, 50, 50, "assets/soldat.png") #Soldat knapp
+        self.knsettings = Knapp(0,0, 50, 50, "assets/settings_button.png") #Settins knapp
 
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
             if event.type == pygame.QUIT:
                 self.next_state = None
                 self.done = True
-            # Menu sjekk button ESC
+            # Menu sjekk
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.knsettings.sjekk_klikk(event.pos):
+                    self.next_state = "MENU"
+                    self.done = True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.next_state = "MENU"
                     self.done = True
+            
+            #Soldat sjekk
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # venstre musen
-                if self.knapp.sjekk_klikk(event.pos):
-                    self.spillere.append(Spiller(60, 250))
+                if self.knsoldat1.sjekk_klikk(event.pos):
+                    self.spillere.append(Spiller(60, 400))
             
 
 
@@ -44,10 +51,15 @@ class GameState(BaseState):
             soldat.draw(surface)
         for fiende in self.fiender:
             fiende.draw(surface)
-        self.draw_text(surface, "SPACE = send soldat | ESC = meny", self.font, (255, 255, 255), (250, 20))
+        #self.draw_text(surface, "SPACE = send soldat | ESC = meny", self.font, (255, 255, 255), (250, 20))
 
-        #Send soldat_1 knapp
-        self.knapp.draw(surface)
+        #----Knapper----
+
+        #soldat_1 knapp
+        self.knsoldat1.draw(surface)
+        
+        #settings knapp
+        self.knsettings.draw(surface)
 
 
 # Spill klasser
