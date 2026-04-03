@@ -18,10 +18,11 @@ class MenuState(BaseState):
 
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
-            if event.type == pygame.QUIT:
-                self.next_state = None
-                self.done = True
-            
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: #Venstre mus knapp er 1
+                if self.knstopp.sjekk_klikk(event.pos):
+                    self.next_state = None
+                    self.done = True
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: #Venstre mus knapp er 1 
                 if self.knfortsett.sjekk_klikk(event.pos):
