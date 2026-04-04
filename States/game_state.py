@@ -4,6 +4,7 @@ Dette er staten for spillet. Det er her du legger til Spillobjekter, logikk, etc
 
 from states.base_state import BaseState
 import pygame
+import math
 
 
 class GameState(BaseState):
@@ -65,20 +66,49 @@ class GameState(BaseState):
 # Spill klasser
 
 class Spillobjekt():
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, hp, rekkevidde, skade, atk_type):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.rect = pygame.Rect(x - width // 2, y - height // 2, width, height)
 
+        self.hp = hp
+        self.rekkevidde = rekkevidde
+        self.skade = skade
+        self.atk_type = atk_type
+
+        self.rect = pygame.Rect(x - width // 2, y - height // 2, width, height)
+    
+    def sjekk_rekkevidde(self, target):
+        dx = self.x - target.x
+        dy = self.y - target.y
+        avstand = math.sqrt(dx**2 + dy**2)
+        return avstand <= self.rekkevidde
+    
+    def angrip(self,target, prosejektiler):
+        
+        if self.atk_type == "melee":
+            target.hp -= self.skade
+        elif self.atk_type == "ranged":
+            dx = target.x - self.x
+            dy = target.y - self.y
+            avstand = math.sqrt(dx**2 + dy**2)
+
+            if avstand == 0:
+                return
+            retning_x = dx / avstand
+            retning_y = dy / avstand
+            
+            prosjektiler.append(prosejektiler(self.x, self.y, retning_x, retning_y, skade=self.skade))
+
+    def update(self, dt):
+        self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height // 2, self.width, self.height)
 
 class Spiller(Spillobjekt):
     def __init__(self, x, y):
         super().__init__(x, y, width = 10, height = 10)
         self.color = (0, 200, 0)
-        self.speed = 2
-        self.hp = 3
+
 
 
     def update(self, dt):
@@ -93,8 +123,6 @@ class Fiende(Spillobjekt):
     def __init__(self, x, y):
         super().__init__(x, y, width = 20, height = 20)
         self.color = (200, 0, 0)
-        self.speed = 2
-        self.hp = 3
 
     def update(self, dt):
         self.x -= self.speed
