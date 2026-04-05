@@ -33,7 +33,7 @@ class GameState(BaseState):
             #Soldat sjekk
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # venstre musen
                 if self.knsoldat1.sjekk_klikk(event.pos):
-                    self.spillere.append(Spiller(60, 400))
+                    self.spillere.append(Spiller(60, 400,hp=100, rekkevidde=100, skade=10, atk_type="Ranged"))
             
 
 
@@ -42,7 +42,8 @@ class GameState(BaseState):
         for soldat in self.spillere:
             soldat.update(dt)
         for fiende in self.fiender:
-            fiende.update(dt)
+            if soldat.sjekk_rekkevidde(fiende):
+                soldat.angrrip(fiende, self.prosjektiler)
 
     def draw(self, surface: pygame.Surface):
         surface.fill((0, 0, 0))
@@ -101,19 +102,22 @@ class Spillobjekt():
             
             prosjektiler.append(prosejektiler(self.x, self.y, retning_x, retning_y, skade=self.skade))
 
-    def update(self, dt):
+    def update_base(self, dt):
         self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height // 2, self.width, self.height)
 
 class Spiller(Spillobjekt):
-    def __init__(self, x, y):
-        super().__init__(x, y, width = 10, height = 10)
+    def __init__(self, x, y, **kwargs):
+        super().__init__(x, y, width = 20, height = 30, **kwargs)
+        self.speed = 2
         self.color = (0, 200, 0)
+        
 
 
 
     def update(self, dt):
         self.x += self.speed
-        self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height // 2, self.width, self.height)
+        self.update_base(dt)
+
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect)
@@ -121,12 +125,13 @@ class Spiller(Spillobjekt):
 
 class Fiende(Spillobjekt):
     def __init__(self, x, y):
-        super().__init__(x, y, width = 20, height = 20)
+        super().__init__(x, y, width = 20, height = 20, **kwargs)
+        self.speed = 2
         self.color = (200, 0, 0)
 
     def update(self, dt):
         self.x -= self.speed
-        self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height // 2, self.width, self.height)
+        self.update_base(dt)
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect)
