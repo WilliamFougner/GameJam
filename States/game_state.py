@@ -5,6 +5,7 @@ Dette er staten for spillet. Det er her du legger til Spillobjekter, logikk, etc
 from states.base_state import BaseState
 import pygame
 import math
+import random
 
 
 class GameState(BaseState):
@@ -17,7 +18,11 @@ class GameState(BaseState):
         self.fiende_base  = Base(950, 400, (180, 0, 0))
         self.knsoldat1 = Knapp(700, 0, 50, 50, "assets/soldat.png")
         self.knsettings = Knapp(0, 0, 50, 50, "assets/settings_button.png")
-        self.fiender.append(Fiende(900, 400, 20, 30, 100, 600, 20, "ranged"))
+        self.fiender.append(Fiende(950, 400, 20, 30, 100, 600, 20, "ranged"))
+        self.spawn_timer = 0
+        self.spawn_intervall = random.uniform(1, 5)
+        self.gull = 100
+        self.gull_timer = 0
 
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
@@ -33,9 +38,22 @@ class GameState(BaseState):
                     self.next_state = "MENU"
                     self.done = True
                 elif self.knsoldat1.sjekk_klikk(event.pos):
-                    self.spillere.append(Spiller(60, 400, 20, 30, 150, 600, 50, "ranged"))
+                    if self.gull >= 50:
+                        self.spillere.append(Spiller(60, 400, 20, 30, 150, 600, 50, "ranged"))
+                        self.gull -= 50
 
     def update(self, dt: float):
+        self.gull_timer += dt
+        if self.gull_timer >= 1:
+            self.gull += 10
+            self.gull_timer = 0
+
+        self.spawn_timer += dt
+        if self.spawn_timer >= self.spawn_intervall:
+            self.fiender.append(Fiende(950, 400, 20, 30, 100, 600, 20, "ranged"))
+            self.spawn_timer = 0
+            self.spawn_intervall = random.uniform(2, 5)
+
         for soldat in self.spillere:
             soldat.update(dt)
             soldat.speed = 2
@@ -95,6 +113,7 @@ class GameState(BaseState):
             skudd.draw(surface)
         self.knsoldat1.draw(surface)
         self.knsettings.draw(surface)
+        self.draw_text(surface, f"Gull: {self.gull}", self.font, (255, 215, 0), (500, 20))
 
 
 # ================================
