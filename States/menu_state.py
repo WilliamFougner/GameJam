@@ -42,8 +42,6 @@ class MenuState(BaseState):
         self.knfortsett.draw(surface)
         self.knstopp.draw(surface)
          
-        
-        self.draw_text(surface, "Welcome! to the game Trykk SPACE for å starte.", self.font, (255, 255, 255), (500, 400))
 
 class knapp():
     def __init__(self, x, y, width, height, tykkelse = 2):

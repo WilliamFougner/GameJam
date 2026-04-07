@@ -13,27 +13,31 @@ class GameState(BaseState):
         self.spillere = []
         self.fiender  = []
         self.prosjektiler = []
-        self.spiller_base = Base(50, 250, (0, 180, 0))
-        self.fiende_base  = Base(750, 250, (180, 0, 0))
+        self.spiller_base = Base(50, 400, (0, 180, 0))
+        self.fiende_base  = Base(950, 400, (180, 0, 0))
         self.knsoldat1 = Knapp(700, 0, 50, 50, "assets/soldat.png")
         self.knsettings = Knapp(0, 0, 50, 50, "assets/settings_button.png")
-        self.fiender.append(Fiende(900, 400, 20, 30, 100, 700, 200, "ranged"))
+        self.fiender.append(Fiende(900, 400, 20, 30, 100, 600, 50, "ranged"))
 
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
             if event.type == pygame.QUIT:
                 self.next_state = None
                 self.done = True
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.next_state = "MENU"
-                    self.done = True
+            
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.knsettings.sjekk_klikk(event.pos):
                     self.next_state = "MENU"
                     self.done = True
-                elif self.knsoldat1.sjekk_klikk(event.pos):
-                    self.spillere.append(Spiller(60, 400, 20, 30, 100, 500, 100, "ranged"))
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.next_state = "MENU"
+                    self.done = True
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.knsoldat1.sjekk_klikk(event.pos):
+                    self.spillere.append(Spiller(60, 400, 20, 30, 100, 600, 50, "ranged"))
 
     def update(self, dt: float):
         for soldat in self.spillere:
@@ -48,6 +52,23 @@ class GameState(BaseState):
                     fiende.angrip(soldat, self.prosjektiler)
         for skudd in self.prosjektiler:
             skudd.update(dt)
+
+        for skudd in self.prosjektiler[:]:
+            for fiende in self.fiender:
+                if fiende.rect.collidepoint(skudd.x, skudd.y):
+                    fiende.hp -= skudd.skade
+                    self.prosjektiler.remove(skudd)
+                    break
+            for soldat in self.spillere:
+                if soldat.rect.collidepoint(skudd.x, skudd.y):
+                    soldat.hp -= skudd.skade
+                    self.prosjektiler.remove(skudd)
+                    break
+        
+        self.spillere = [soldat for soldat in self.spillere if soldat.hp > 0] #Beholder de som er i live
+        self.fiender  = [fiende for fiende in self.fiender  if fiende.hp > 0] #Beholder de som er i live ye
+
+
 
         self.spillere = [s for s in self.spillere if not s.rect.colliderect(self.fiende_base.rect)]
         self.fiender  = [f for f in self.fiender  if not f.rect.colliderect(self.spiller_base.rect)]
@@ -86,8 +107,9 @@ class Spillobjekt():
     def sjekk_rekkevidde(self, target):
         dx = self.x - target.x
         dy = self.y - target.y
-        return dx**2 + dy**2 <= self.rekkevidde**2
-
+        avstand = dx**2 + dy**2
+        return avstand <= self.rekkevidde**2
+    
     def angrip(self, target, prosjektiler):
         if self.cooldown > 0:
             return
@@ -100,12 +122,16 @@ class Spillobjekt():
             avstand = math.sqrt(dx**2 + dy**2)
             if avstand == 0:
                 return
-            prosjektiler.append(Prosjektil(self.x, self.y, dx / avstand, dy / avstand, self.skade))
+            retning_x = dx / avstand
+            retning_y = dy / avstand
+            prosjektiler.append(Prosjektil(self.x, self.y, retning_x, retning_y, self.skade))
         self.cooldown = 1
 
     def update_base(self, dt):
         self.cooldown -= dt
         self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height // 2, self.width, self.height)
+        
+          
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect)
@@ -159,8 +185,8 @@ class Knapp:
 
 class Prosjektil:
     def __init__(self, x, y, retning_x, retning_y, skade):
-        self.x = x
-        self.y = y
+        self.x = x + retning_x * 20
+        self.y = y + retning_y * 20
         self.retning_x = retning_x
         self.retning_y = retning_y
         self.skade = skade
