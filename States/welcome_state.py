@@ -26,16 +26,15 @@ class WelcomeState(BaseState):
         pass
 
     def draw(self, surface):
-        # 🖼️ Tegn bakgrunn
         surface.blit(self.background, (0, 0))
 
-        # 🌑 Mørk overlay (gjør tekst lettere å lese)
+
         overlay = pygame.Surface((1000, 600))
         overlay.set_alpha(120)
         overlay.fill((0, 0, 0))
         surface.blit(overlay, (0, 0))
 
-        # 📝 Tekst
+
         self.draw_text(surface, "VELKOMMEN!", self.font_big, (255,255,255), (500, 150))
 
         self.draw_text(
