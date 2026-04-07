@@ -24,19 +24,15 @@ class GameState(BaseState):
             if event.type == pygame.QUIT:
                 self.next_state = None
                 self.done = True
-            
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if self.knsettings.sjekk_klikk(event.pos):
-                    self.next_state = "MENU"
-                    self.done = True
-
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.next_state = "MENU"
                     self.done = True
-
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if self.knsoldat1.sjekk_klikk(event.pos):
+                if self.knsettings.sjekk_klikk(event.pos):
+                    self.next_state = "MENU"
+                    self.done = True
+                elif self.knsoldat1.sjekk_klikk(event.pos):
                     self.spillere.append(Spiller(60, 400, 20, 30, 150, 600, 50, "ranged"))
 
     def update(self, dt: float):
@@ -45,7 +41,7 @@ class GameState(BaseState):
             soldat.speed = 2
             for fiende in self.fiender:
                 if soldat.sjekk_rekkevidde(fiende):
-                    soldat.speed =0
+                    soldat.speed = 0
                     soldat.angrip(fiende, self.prosjektiler)
         for fiende in self.fiender:
             fiende.update(dt)
@@ -68,14 +64,24 @@ class GameState(BaseState):
                     soldat.hp -= skudd.skade
                     self.prosjektiler.remove(skudd)
                     break
-        
-        self.spillere = [soldat for soldat in self.spillere if soldat.hp > 0] #Beholder de som er i live
-        self.fiender  = [fiende for fiende in self.fiender  if fiende.hp > 0] #Beholder de som er i live ye
 
+        self.prosjektiler = [s for s in self.prosjektiler if 0 < s.x < 1000]
 
+        nye_spillere = []
+        for s in self.spillere:
+            if s.rect.colliderect(self.fiende_base.rect):
+                self.fiende_base.hp = max(0, self.fiende_base.hp - 1)
+            elif s.hp > 0:
+                nye_spillere.append(s)
+        self.spillere = nye_spillere
 
-        self.spillere = [s for s in self.spillere if not s.rect.colliderect(self.fiende_base.rect)]
-        self.fiender  = [f for f in self.fiender  if not f.rect.colliderect(self.spiller_base.rect)]
+        nye_fiender = []
+        for f in self.fiender:
+            if f.rect.colliderect(self.spiller_base.rect):
+                self.spiller_base.hp = max(0, self.spiller_base.hp - 1)
+            elif f.hp > 0:
+                nye_fiender.append(f)
+        self.fiender = nye_fiender
 
     def draw(self, surface: pygame.Surface):
         surface.fill((0, 0, 0))
@@ -111,13 +117,11 @@ class Spillobjekt():
     def sjekk_rekkevidde(self, target):
         dx = self.x - target.x
         dy = self.y - target.y
-        avstand = dx**2 + dy**2
-        return avstand <= self.rekkevidde**2
-    
+        return dx**2 + dy**2 <= self.rekkevidde**2
+
     def angrip(self, target, prosjektiler):
         if self.cooldown > 0:
             return
-   
         if self.atk_type == "melee":
             target.hp -= self.skade
         elif self.atk_type == "ranged":
@@ -134,8 +138,6 @@ class Spillobjekt():
     def update_base(self, dt):
         self.cooldown -= dt
         self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height // 2, self.width, self.height)
-        
-          
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect)
