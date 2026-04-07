@@ -61,6 +61,7 @@ class GameState(BaseState):
                 if soldat.sjekk_rekkevidde(fiende):
                     soldat.speed = 0
                     soldat.angrip(fiende, self.prosjektiler)
+
         for fiende in self.fiender:
             fiende.update(dt)
             fiende.speed = 2
@@ -68,6 +69,7 @@ class GameState(BaseState):
                 if fiende.sjekk_rekkevidde(soldat):
                     fiende.speed = 0
                     fiende.angrip(soldat, self.prosjektiler)
+
         for skudd in self.prosjektiler:
             skudd.update(dt)
 
@@ -100,6 +102,15 @@ class GameState(BaseState):
             elif f.hp > 0:
                 nye_fiender.append(f)
         self.fiender = nye_fiender
+
+        # 🏆 WIN / LOSE SYSTEM (FERDIG OG RIKTIG)
+        if self.fiende_base.hp <= 0:
+            self.next_state = "VICTORY"
+            self.done = True
+
+        elif self.spiller_base.hp <= 0:
+            self.next_state = "MENU"
+            self.done = True
 
     def draw(self, surface: pygame.Surface):
         surface.fill((0, 0, 0))
