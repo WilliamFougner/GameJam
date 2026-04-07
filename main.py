@@ -6,6 +6,7 @@ import pygame
 from states.base_state import BaseState
 from states.menu_state import MenuState
 from states.game_state import GameState
+from states.welcome_state import WelcomeState
 
 class Spill:
     def __init__(self):
@@ -14,10 +15,11 @@ class Spill:
         self.clock = pygame.time.Clock()
         self.running = True
         self.states = {
+            "WELCOME": WelcomeState(),
             "MENU": MenuState(),
             "GAME": GameState()
         }
-        self.current_state = self.states["MENU"]
+        self.current_state = self.states["WELCOME"]
 
     def main_loop(self):
         self.handle_events()
