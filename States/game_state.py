@@ -14,16 +14,18 @@ class GameState(BaseState):
         self.spillere = []
         self.fiender  = []
         self.prosjektiler = []
-        self.spiller_base = Base(50, 400, (0, 180, 0))
-        self.fiende_base  = Base(950, 400, (180, 0, 0))
-        self.knsoldat1 = Knapp(700, 0, 50, 50, "assets/soldat.png")
-        self.knrobot = Knapp(760, 0, 50, 50, "assets/robot.png")
+        self.spiller_base = Base(147, 0, 44, 800, (255, 255, 0))
+        self.fiende_base  = Base(1197, 0, 42, 800, (255, 255, 255))
+        self.knsoldat1 = Knapp(1100, 0, 50, 50, "assets/soldat.png")
+        self.knrobot = Knapp(1160, 0, 50, 50, "assets/robot.png")
         self.knsettings = Knapp(0, 0, 50, 50, "assets/settings_button.png")
 
         self.spawn_timer = 0
         self.spawn_intervall = random.uniform(1, 5)
         self.gull = 100
         self.gull_timer = 0
+        self.image = pygame.image.load("assets/bakgrunn.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (1500, 800))
 
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
@@ -40,11 +42,11 @@ class GameState(BaseState):
                     self.done = True
                 elif self.knsoldat1.sjekk_klikk(event.pos):
                     if self.gull >= 50:
-                        self.spillere.append(Spiller(60, 400, 20, 30, 150, 300 , 20, 1, 2, "ranged"))
+                        self.spillere.append(Spiller(145, 622, 20, 30, 150, 300, 20, 1, 2, "ranged"))
                         self.gull -= 50
                 elif self.knrobot.sjekk_klikk(event.pos):
                     if self.gull >= 100:
-                        self.spillere.append(Spiller(60, 400, 30, 40, 450 , 30, 100, 0.5, 4, "melee"))
+                        self.spillere.append(Spiller(147, 622, 30, 40, 450 , 50, 100, 0.5, 4, "melee"))
                         self.gull -= 100
 
     def update(self, dt: float):
@@ -55,7 +57,7 @@ class GameState(BaseState):
 
         self.spawn_timer += dt
         if self.spawn_timer >= self.spawn_intervall:
-            self.fiender.append(Fiende(950, 400, 20, 30, 100, 600, 20, 1, 2, "ranged"))
+            self.fiender.append(Fiende(1500, 622, 20, 30, 100, 600, 20, 1, 2, "ranged"))
             self.spawn_timer = 0
             self.spawn_intervall = random.uniform(2, 5)
 
@@ -92,7 +94,7 @@ class GameState(BaseState):
                         self.prosjektiler.remove(skudd)
                         break
 
-        self.prosjektiler = [s for s in self.prosjektiler if 0 < s.x < 1000] # sltter prosjektiler som er utenfor skjermen
+        self.prosjektiler = [s for s in self.prosjektiler if 0 < s.x < 1500] # sltter prosjektiler som er utenfor skjermen
 
 
         for soldat in self.spillere[:]:
@@ -122,7 +124,7 @@ class GameState(BaseState):
             self.done = True
 
     def draw(self, surface: pygame.Surface):
-        surface.fill((0, 0, 0))
+        surface.blit(self.image, (0, 0))
         self.spiller_base.draw(surface, self.font)
         self.fiende_base.draw(surface, self.font)
         for soldat in self.spillere:
@@ -135,7 +137,11 @@ class GameState(BaseState):
         self.knsettings.draw(surface)
         self.knrobot.draw(surface)
         self.draw_text(surface, f"Gull: {self.gull}", self.font, (255, 215, 0), (500, 20))
-
+"""
+        mouse_pos = pygame.mouse.get_pos()
+        text = self.font.render(f"{mouse_pos}", True, (255, 255, 255))
+        surface.blit(text, (300, 300))
+"""
 
 
 
@@ -219,8 +225,8 @@ class Fiende(Spillobjekt):
 
 
 class Base:
-    def __init__(self, x, y, color):
-        self.rect = pygame.Rect(x - 15, y - 50, 30, 100)
+    def __init__(self, x, y, width, height, color):
+        self.rect = pygame.Rect(x , y, width, height)
         self.color = color
         self.hp = 10
 

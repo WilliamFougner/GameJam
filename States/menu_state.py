@@ -9,11 +9,11 @@ class MenuState(BaseState):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("assets/settings_menu.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (1000, 600))
+        self.image = pygame.transform.scale(self.image, (1500, 800))
         self.font = pygame.font.SysFont("Arial", 24)
 
-        self.knfortsett = knapp(310, 275, 380, 105)
-        self.knstopp = knapp(310, 440, 380, 105)
+        self.knfortsett = knapp(464, 369, 574, 136)
+        self.knstopp = knapp(464, 587, 574, 136)
         
 
     def handle_events(self, events : list[pygame.event.Event]):
@@ -41,7 +41,11 @@ class MenuState(BaseState):
 
         self.knfortsett.draw(surface)
         self.knstopp.draw(surface)
-         
+"""
+        mouse_pos = pygame.mouse.get_pos()
+        text = self.font.render(f"{mouse_pos}", True, (255, 255, 255))
+        surface.blit(text, (300, 300))
+"""
 
 class knapp():
     def __init__(self, x, y, width, height, tykkelse = 2):
