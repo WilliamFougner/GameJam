@@ -49,7 +49,6 @@ class Spill:
     def render(self):
         # Tegner state
         self.current_state.draw(self.screen)
-        self.current_state.draw(self.screen)
         pygame.display.flip()
 
 spill = Spill()
