@@ -17,7 +17,7 @@ class GameState(BaseState):
         self.fiende_base  = Base(950, 400, (180, 0, 0))
         self.knsoldat1 = Knapp(700, 0, 50, 50, "assets/soldat.png")
         self.knsettings = Knapp(0, 0, 50, 50, "assets/settings_button.png")
-        self.fiender.append(Fiende(900, 400, 20, 30, 100, 600, 50, "ranged"))
+        self.fiender.append(Fiende(900, 400, 20, 30, 100, 600, 20, "ranged"))
 
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
@@ -37,18 +37,22 @@ class GameState(BaseState):
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.knsoldat1.sjekk_klikk(event.pos):
-                    self.spillere.append(Spiller(60, 400, 20, 30, 100, 600, 50, "ranged"))
+                    self.spillere.append(Spiller(60, 400, 20, 30, 150, 600, 50, "ranged"))
 
     def update(self, dt: float):
         for soldat in self.spillere:
             soldat.update(dt)
+            soldat.speed = 2
             for fiende in self.fiender:
                 if soldat.sjekk_rekkevidde(fiende):
+                    soldat.speed =0
                     soldat.angrip(fiende, self.prosjektiler)
         for fiende in self.fiender:
             fiende.update(dt)
+            fiende.speed = 2
             for soldat in self.spillere:
                 if fiende.sjekk_rekkevidde(soldat):
+                    fiende.speed = 0
                     fiende.angrip(soldat, self.prosjektiler)
         for skudd in self.prosjektiler:
             skudd.update(dt)
@@ -113,7 +117,7 @@ class Spillobjekt():
     def angrip(self, target, prosjektiler):
         if self.cooldown > 0:
             return
-        self.speed = 0
+   
         if self.atk_type == "melee":
             target.hp -= self.skade
         elif self.atk_type == "ranged":
