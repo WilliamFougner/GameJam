@@ -6,6 +6,10 @@ import pygame
 from states.base_state import BaseState
 from states.menu_state import MenuState
 from states.game_state import GameState
+from states.welcome_state import WelcomeState
+from states.victory_state import VictoryState
+
+
 
 class Spill:
     def __init__(self):
@@ -14,10 +18,12 @@ class Spill:
         self.clock = pygame.time.Clock()
         self.running = True
         self.states = {
+            "WELCOME": WelcomeState(),
             "MENU": MenuState(),
-            "GAME": GameState()
+            "GAME": GameState(),
+            "VICTORY": VictoryState()
         }
-        self.current_state = self.states["MENU"]
+        self.current_state = self.states["WELCOME"]
 
     def main_loop(self):
         self.handle_events()
@@ -48,7 +54,6 @@ class Spill:
 
     def render(self):
         # Tegner state
-        self.current_state.draw(self.screen)
         self.current_state.draw(self.screen)
         pygame.display.flip()
 

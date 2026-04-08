@@ -9,7 +9,7 @@ class VictoryState(BaseState):
 
         # 🖼️ Bakgrunnsbilde
         self.background = pygame.image.load("assets/victory.jpg").convert()
-        self.background = pygame.transform.scale(self.background, (1000, 600))
+        self.background = pygame.transform.scale(self.background, (1500, 800))
 
     def handle_events(self, events):
         for event in events:

@@ -9,7 +9,7 @@ class WelcomeState(BaseState):
 
         # 🖼️ Bakgrunnsbilde
         self.background = pygame.image.load("assets/kratos.jpg").convert()
-        self.background = pygame.transform.scale(self.background, (1000, 600))
+        self.background = pygame.transform.scale(self.background, (1500, 800))
 
     def handle_events(self, events):
         for event in events:
@@ -29,7 +29,7 @@ class WelcomeState(BaseState):
         surface.blit(self.background, (0, 0))
 
 
-        overlay = pygame.Surface((1000, 600))
+        overlay = pygame.Surface((1500, 800))
         overlay.set_alpha(120)
         overlay.fill((0, 0, 0))
         surface.blit(overlay, (0, 0))
