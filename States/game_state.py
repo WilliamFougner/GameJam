@@ -16,8 +16,8 @@ class GameState(BaseState):
         self.prosjektiler = []
         self.spiller_base = Base(147, 0, 44, 800, (255, 255, 0))
         self.fiende_base  = Base(1197, 0, 42, 800, (255, 255, 255))
-        self.knsoldat1 = Knapp(1100, 0, 50, 50, "assets/soldat.png")
-        self.knrobot = Knapp(1160, 0, 50, 50, "assets/robot.png")
+        self.knsoldat1 = Knapp(1100, 0, 50, 50, "assets/soldat_button.png")
+        self.knrobot = Knapp(1160, 0, 50, 50, "assets/robot_button.png")
         self.knsettings = Knapp(0, 0, 50, 50, "assets/settings_button.png")
 
         self.spawn_timer = 0
@@ -42,11 +42,11 @@ class GameState(BaseState):
                     self.done = True
                 elif self.knsoldat1.sjekk_klikk(event.pos):
                     if self.gull >= 50:
-                        self.spillere.append(Spiller(145, 622, 20, 30, 150, 300, 20, 1, 2, "ranged"))
+                        self.spillere.append(Spiller(145, 613, 170, 100, 150, 300, 20, 1, 2, "ranged", "assets/tank.png"))
                         self.gull -= 50
                 elif self.knrobot.sjekk_klikk(event.pos):
                     if self.gull >= 100:
-                        self.spillere.append(Spiller(147, 622, 30, 40, 450 , 50, 100, 0.5, 4, "melee"))
+                        self.spillere.append(Spiller(145, 620, 120, 200, 450 , 50, 100, 0.67, 4, "melee", "assets/robot.png"))
                         self.gull -= 100
 
     def update(self, dt: float):
@@ -57,7 +57,7 @@ class GameState(BaseState):
 
         self.spawn_timer += dt
         if self.spawn_timer >= self.spawn_intervall:
-            self.fiender.append(Fiende(1500, 622, 20, 30, 100, 600, 20, 1, 2, "ranged"))
+            self.fiender.append(Fiende(1500, 622, 70, 80, 100, 600, 20, 1, 2, "ranged", "assets/alian.png"))
             self.spawn_timer = 0
             self.spawn_intervall = random.uniform(2, 5)
 
@@ -137,11 +137,11 @@ class GameState(BaseState):
         self.knsettings.draw(surface)
         self.knrobot.draw(surface)
         self.draw_text(surface, f"Gull: {self.gull}", self.font, (255, 215, 0), (500, 20))
-"""
+
         mouse_pos = pygame.mouse.get_pos()
         text = self.font.render(f"{mouse_pos}", True, (255, 255, 255))
         surface.blit(text, (300, 300))
-"""
+
 
 
 
@@ -150,7 +150,7 @@ class GameState(BaseState):
 # ================================
 
 class Spillobjekt():
-    def __init__(self, x, y, width, height, hp, rekkevidde, skade, speed, cooldown, atk_type, team):
+    def __init__(self, x, y, width, height, hp, rekkevidde, skade, speed, cooldown, atk_type, team, bilde_navn):
         self.x = x
         self.y = y
         self.width = width
@@ -165,7 +165,10 @@ class Spillobjekt():
         self.atk_type = atk_type
         self.team = team
 
-        self.rect = pygame.Rect(x - width // 2, y - height // 2, width, height)
+        self.bilde = pygame.image.load(bilde_navn).convert_alpha()
+        self.bilde = pygame.transform.scale(self.bilde, (width, height))
+
+        self.rect = pygame.Rect(x - width // 2, y - height, width, height)
 
     def sjekk_rekkevidde(self, target):
         dx = self.x - target.x
@@ -189,23 +192,22 @@ class Spillobjekt():
                 return
             retning_x = dx / avstand
             retning_y = dy / avstand
-            prosjektiler.append(Prosjektil(self.x, self.y, retning_x, retning_y, self.skade, self.team))
+            prosjektiler.append(Prosjektil(self.x, self.y - self.height // 2, retning_x, retning_y, self.skade, self.team))
         self.cooldown_count = self.cooldown_std
 
     def update_base(self, dt):
         self.cooldown_count -= dt
-        self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height // 2, self.width, self.height)
+        self.rect = pygame.Rect(self.x - self.width // 2, self.y - self.height, self.width, self.height)
 
     def draw(self, surface):
-        pygame.draw.rect(surface, self.color, self.rect)
+        surface.blit(self.bilde, self.rect)
 
 
 class Spiller(Spillobjekt):
-    def __init__(self, x, y, width, height, hp, rekkevidde, skade,speed, cooldown, atk_type):
-        super().__init__(x, y, width, height, hp, rekkevidde, skade, speed, cooldown,  atk_type, team="spiller")
+    def __init__(self, x, y, width, height, hp, rekkevidde, skade,speed, cooldown, atk_type, bilde_navn):
+        super().__init__(x, y, width, height, hp, rekkevidde, skade, speed, cooldown,  atk_type, team="spiller", bilde_navn=bilde_navn)
         self.speed = speed
         self.cooldown_std = cooldown
-        self.color = (0, 128, 0)
 
     def update(self, dt):
         self.x += self.speed
@@ -213,8 +215,8 @@ class Spiller(Spillobjekt):
 
 
 class Fiende(Spillobjekt):
-    def __init__(self, x, y, width, height, hp, rekkevidde, skade, speed, cooldown, atk_type):
-        super().__init__(x, y, width, height, hp, rekkevidde, skade,speed, cooldown, atk_type, team="fiende")
+    def __init__(self, x, y, width, height, hp, rekkevidde, skade, speed, cooldown, atk_type, bilde_navn):
+        super().__init__(x, y, width, height, hp, rekkevidde, skade,speed, cooldown, atk_type, team="fiende", bilde_navn=bilde_navn)
         self.speed = speed
         self.cooldown_std = cooldown
         self.color = (255, 0, 0)

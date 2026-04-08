@@ -41,10 +41,11 @@ class MenuState(BaseState):
 
         self.knfortsett.draw(surface)
         self.knstopp.draw(surface)
-
+"""
         mouse_pos = pygame.mouse.get_pos()
         text = self.font.render(f"{mouse_pos}", True, (255, 255, 255))
         surface.blit(text, (300, 300))
+"""
 
 
 class knapp():
@@ -55,7 +56,7 @@ class knapp():
 
     
     def draw(self, surface):
-         pygame.draw.rect(surface, self.farge, self.rect, self.tykkelse)
+        pass
     
     def sjekk_klikk(self,mouse_pos):
         return self.rect.collidepoint(mouse_pos)

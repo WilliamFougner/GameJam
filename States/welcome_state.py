@@ -19,7 +19,7 @@ class WelcomeState(BaseState):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    self.next_state = "MENU"
+                    self.next_state = "GAME"
                     self.done = True
 
     def update(self, dt):
@@ -33,10 +33,6 @@ class WelcomeState(BaseState):
         overlay.set_alpha(120)
         overlay.fill((0, 0, 0))
         surface.blit(overlay, (0, 0))
-
-        mouse_pos = pygame.mouse.get_pos()
-        text = self.font.render(f"{mouse_pos}", True, (255, 255, 255))
-        surface.blit(text, (300, 300))
 
 
         self.draw_text(surface, "VELKOMMEN!", self.font_big, (255,255,255), (750, 150))

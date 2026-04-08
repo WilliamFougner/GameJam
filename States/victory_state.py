@@ -36,6 +36,6 @@ class VictoryState(BaseState):
         surface.blit(overlay, (0, 0))
 
        
-        self.draw_text(surface, "YOU WIN!", self.font_big, (0,255,0), (750, 200))
+        self.draw_text(surface, "YOU WIN!", self.font_big, (0,255,0), (750, 150))
         self.draw_text(surface, "Fiendens base er ødelagt!", self.font_small, (255,255,255), (750, 300))
         self.draw_text(surface, "Trykk SPACE for meny", self.font_small, (200,200,200), (750, 400))
