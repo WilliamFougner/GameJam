@@ -31,7 +31,7 @@ class GameState(BaseState):
         pygame.mixer.music.load("assets/gamestate_music.mp3")
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(1)
-        
+
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
             if event.type == pygame.QUIT:
@@ -129,20 +129,30 @@ class GameState(BaseState):
             self.done = True
 
     def draw(self, surface: pygame.Surface):
+        # Bakgrunn
         surface.blit(self.image, (0, 0))
-        self.spiller_base.draw(surface, self.font)
-        self.fiende_base.draw(surface, self.font)
+    
+        # Tegn HP uten de lange rektanglene
+        surface.blit(self.font.render(f"Spiller Base HP: {self.spiller_base.hp}", True, (255, 255, 255)), (120, 300))
+        surface.blit(self.font.render(f"Fiende Base HP: {self.fiende_base.hp}", True, (255, 255, 255)), (1200, 300))
+    
+        # Tegn spillobjekter
         for soldat in self.spillere:
             soldat.draw(surface)
         for fiende in self.fiender:
             fiende.draw(surface)
         for skudd in self.prosjektiler:
             skudd.draw(surface)
+    
+        # Tegn knapper
         self.knsoldat1.draw(surface)
         self.knsettings.draw(surface)
         self.knrobot.draw(surface)
+    
+        # Tegn gull
         self.draw_text(surface, f"Gull: {self.gull}", self.font, (255, 215, 0), (500, 20))
-
+    
+        # Tegn museposisjon (debug)
         mouse_pos = pygame.mouse.get_pos()
         text = self.font.render(f"{mouse_pos}", True, (255, 255, 255))
         surface.blit(text, (300, 300))
