@@ -7,7 +7,7 @@ class VictoryState(BaseState):
         self.font_big = pygame.font.SysFont("Arial", 60)
         self.font_small = pygame.font.SysFont("Arial", 30)
 
-        # 🖼️ Bakgrunnsbilde
+  
         self.background = pygame.image.load("assets/victory.jpg").convert()
         self.background = pygame.transform.scale(self.background, (1500, 800))
 
@@ -26,16 +26,16 @@ class VictoryState(BaseState):
         pass
 
     def draw(self, surface):
-        # 🖼️ Bakgrunn
+    
         surface.blit(self.background, (0, 0))
 
-        # 🌑 Overlay
-        overlay = pygame.Surface((1000, 600))
+    
+        overlay = pygame.Surface((1500, 80))
         overlay.set_alpha(120)
         overlay.fill((0, 0, 0))
         surface.blit(overlay, (0, 0))
 
-        # 🏆 Tekst
-        self.draw_text(surface, "YOU WIN!", self.font_big, (0,255,0), (500, 200))
-        self.draw_text(surface, "Fiendens base er ødelagt!", self.font_small, (255,255,255), (500, 300))
-        self.draw_text(surface, "Trykk SPACE for meny", self.font_small, (200,200,200), (500, 400))
+       
+        self.draw_text(surface, "YOU WIN!", self.font_big, (0,255,0), (750, 200))
+        self.draw_text(surface, "Fiendens base er ødelagt!", self.font_small, (255,255,255), (750, 300))
+        self.draw_text(surface, "Trykk SPACE for meny", self.font_small, (200,200,200), (750, 400))

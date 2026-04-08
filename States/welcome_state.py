@@ -7,7 +7,7 @@ class WelcomeState(BaseState):
         self.font_big = pygame.font.SysFont("Arial", 50)
         self.font_small = pygame.font.SysFont("Arial", 24)
 
-        # 🖼️ Bakgrunnsbilde
+
         self.background = pygame.image.load("assets/kratos.jpg").convert()
         self.background = pygame.transform.scale(self.background, (1500, 800))
 
@@ -34,15 +34,19 @@ class WelcomeState(BaseState):
         overlay.fill((0, 0, 0))
         surface.blit(overlay, (0, 0))
 
+        mouse_pos = pygame.mouse.get_pos()
+        text = self.font.render(f"{mouse_pos}", True, (255, 255, 255))
+        surface.blit(text, (300, 300))
 
-        self.draw_text(surface, "VELKOMMEN!", self.font_big, (255,255,255), (500, 150))
+
+        self.draw_text(surface, "VELKOMMEN!", self.font_big, (255,255,255), (750, 150))
 
         self.draw_text(
             surface,
             "Målet er å ødelegge fiendens base.",
             self.font_small,
             (255,255,255),
-            (500, 300)
+            (750, 400)
         )
 
         self.draw_text(
@@ -50,7 +54,7 @@ class WelcomeState(BaseState):
             "Klikk for å spawn soldater.",
             self.font_small,
             (255,255,255),
-            (500, 340)
+            (750, 500)
         )
 
         self.draw_text(
@@ -58,5 +62,5 @@ class WelcomeState(BaseState):
             "Trykk SPACE for å starte",
             self.font_small,
             (200,200,200),
-            (500, 450)
+            (750, 570)
         )

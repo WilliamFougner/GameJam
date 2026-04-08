@@ -41,11 +41,11 @@ class MenuState(BaseState):
 
         self.knfortsett.draw(surface)
         self.knstopp.draw(surface)
-"""
+
         mouse_pos = pygame.mouse.get_pos()
         text = self.font.render(f"{mouse_pos}", True, (255, 255, 255))
         surface.blit(text, (300, 300))
-"""
+
 
 class knapp():
     def __init__(self, x, y, width, height, tykkelse = 2):
