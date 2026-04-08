@@ -11,21 +11,30 @@ import random
 class GameState(BaseState):
     def __init__(self):
         super().__init__()
-        self.spillere = []
-        self.fiender  = []
-        self.prosjektiler = []
-        self.spiller_base = Base(147, 0, 44, 800, (255, 255, 0))
-        self.fiende_base  = Base(1197, 0, 42, 800, (255, 255, 255))
-        self.knsoldat1 = Knapp(1100, 0, 50, 50, "assets/soldat_button.png")
-        self.knrobot = Knapp(1160, 0, 50, 50, "assets/robot_button.png")
-        self.knsettings = Knapp(0, 0, 50, 50, "assets/settings_button.png")
 
-        self.spawn_timer = 0
-        self.spawn_intervall = random.uniform(1, 5)
-        self.gull = 100
-        self.gull_timer = 0
+        # Lister
+        self.spillere = [] # liste over spillere
+        self.fiender  = [] # liste over fiender
+        self.prosjektiler = [] # liste over prosjektiler
+        self.eksplosjoner = [] # liste over eksplosjoner
+        # Baser og knapper
+        self.spiller_base = Base(147, 0, 44, 800, (255, 255, 0)) # spillerens base
+        self.fiende_base  = Base(1197, 0, 42, 800, (255, 255, 255)) # fiendens base
+        self.knsoldat1 = Knapp(1100, 0, 50, 50, "assets/soldat_button.png") #knapp for å spawene en tank
+        self.knrobot = Knapp(1160, 0, 50, 50, "assets/robot_button.png") #knapp for å spawene en robot/mech
+        self.knsettings = Knapp(0, 0, 50, 50, "assets/settings_button.png") #knapp for innstillinger
+        
+
+        self.spawn_timer = 0 # tid for å spawne neste fien
+        self.spawn_intervall = random.uniform(1, 5) # tilfeldig sjanse for å spawne
+        self.gull = 100 # start gull
+        self.gull_timer = 0 # timeren for å få mer gull
+
+        # Bakgrunns bilde
         self.image = pygame.image.load("assets/bakgrunn.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (1500, 800))
+
+        self.eksplosjon_lyd = pygame.mixer.Sound("assets/explosion.mp3")
 
     def on_enter(self):
         pygame.mixer.music.load("assets/gamestate_music.mp3")
@@ -52,20 +61,24 @@ class GameState(BaseState):
                 elif self.knrobot.sjekk_klikk(event.pos):
                     if self.gull >= 100:
                         self.spillere.append(Spiller(145, 620, 120, 200, 450 , 50, 100, 0.67, 4, "melee", "assets/robot.png"))
-                        self.gull -= 100
+                        self.gull -= 100    
 
     def update(self, dt: float):
+
+        #Gull timer
         self.gull_timer += dt
         if self.gull_timer >= 1:
             self.gull += 10
             self.gull_timer = 0
 
+        # Fiende spawn timer
         self.spawn_timer += dt
         if self.spawn_timer >= self.spawn_intervall:
             self.fiender.append(Fiende(1500, 622, 70, 80, 100, 600, 20, 1, 2, "ranged", "assets/alian.png"))
             self.spawn_timer = 0
             self.spawn_intervall = random.uniform(2, 5)
-
+        
+        # Oppdater spillobjekter rekkevidde og angrep
         for soldat in self.spillere:
             soldat.update(dt)
             soldat.speed = soldat.speed_std
@@ -74,6 +87,7 @@ class GameState(BaseState):
                     soldat.speed = 0
                     soldat.angrip(fiende, self.prosjektiler)
 
+        # Oppdater fiender rekkevidde og angrep
         for fiende in self.fiender:
             fiende.update(dt)
             fiende.speed = fiende.speed_std
@@ -82,8 +96,7 @@ class GameState(BaseState):
                     fiende.speed = 0
                     fiende.angrip(soldat, self.prosjektiler)
 
-
-
+        # oppdaterer prosjektiler og sjekker kollisjoner
         for skudd in self.prosjektiler[:]:
             skudd.update(dt)
             if skudd.team == "spiller":
@@ -98,22 +111,30 @@ class GameState(BaseState):
                         soldat.hp -= skudd.skade
                         self.prosjektiler.remove(skudd)
                         break
-
+        
+        # fjerner prosjektiler som er utenfor skjermen 
         self.prosjektiler = [s for s in self.prosjektiler if 0 < s.x < 1500] # sltter prosjektiler som er utenfor skjermen
 
-
+        # Sjekker kollisjoner mellom spillere, fiender og baser
         for soldat in self.spillere[:]:
             if soldat.rect.colliderect(self.fiende_base.rect):
                 if self.fiende_base.hp > 0:
                     self.fiende_base.hp -= 1
+                    self.eksplosjoner.append(Eksplosjon(soldat.x, soldat.y - soldat.height // 2))
+                    self.eksplosjon_lyd.play()
+
                     self.spillere.remove(soldat)
             elif soldat.hp <= 0:
                 self.spillere.remove(soldat)
-        
+
+        # Sjekker kollisjoner for fiender
         for fiende in self.fiender[:]:
             if fiende.rect.colliderect(self.spiller_base.rect):
                 if self.spiller_base.hp > 0:
                     self.spiller_base.hp -= 1
+                    self.eksplosjoner.append(Eksplosjon(fiende.x, fiende.y - fiende.height // 2))
+                    self.eksplosjon_lyd.play()
+
                     self.fiender.remove(fiende)
             elif fiende.hp <= 0:
                 self.fiender.remove(fiende)
@@ -124,6 +145,7 @@ class GameState(BaseState):
             self.next_state = "VICTORY"
             self.done = True
 
+        # Sjekker om spiller basen er ødelagt
         elif self.spiller_base.hp <= 0:
             self.next_state = "MENU"
             self.done = True
@@ -143,7 +165,9 @@ class GameState(BaseState):
             fiende.draw(surface)
         for skudd in self.prosjektiler:
             skudd.draw(surface)
-    
+        for explosion in self.eksplosjoner:
+            explosion.draw(surface)
+
         # Tegn knapper
         self.knsoldat1.draw(surface)
         self.knsettings.draw(surface)
@@ -160,9 +184,9 @@ class GameState(BaseState):
 
 
 
-# ================================
+
 # Hjelpeklasser
-# ================================
+
 
 class Spillobjekt():
     def __init__(self, x, y, width, height, hp, rekkevidde, skade, speed, cooldown, atk_type, team, bilde_navn):
@@ -281,3 +305,18 @@ class Prosjektil:
 
     def draw(self, surface):
         pygame.draw.circle(surface, (255, 255, 0), (int(self.x), int(self.y)), 5)
+
+
+class Eksplosjon:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.timer = 0.5 
+        self.bilde = pygame.image.load("assets/explosion.png").convert_alpha()
+        self.bilde = pygame.transform.scale(self.bilde, (80, 80))
+
+    def update(self, dt):
+        self.timer -= dt
+
+    def draw(self, surface):
+        surface.blit(self.bilde, (self.x - 40, self.y - 40))

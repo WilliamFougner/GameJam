@@ -49,7 +49,7 @@ class Spill:
             next_state = self.current_state.next_state
             self.current_state.done = False
             if next_state:
-                if next_state == "GAME":
+                if next_state == "GAME" and isinstance(self.current_state, VictoryState):
                     self.states["GAME"] = GameState()
                 self.current_state = self.states[next_state]
                 self.current_state.on_enter()
