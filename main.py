@@ -9,7 +9,7 @@ from states.game_state import GameState
 from states.welcome_state import WelcomeState
 from states.victory_state import VictoryState
 
-
+pygame.mixer.init()
 
 class Spill:
     def __init__(self):
@@ -24,6 +24,7 @@ class Spill:
             "VICTORY": VictoryState()
         }
         self.current_state = self.states["WELCOME"]
+        self.current_state.on_enter()
 
     def main_loop(self):
         self.handle_events()
@@ -48,7 +49,10 @@ class Spill:
             next_state = self.current_state.next_state
             self.current_state.done = False
             if next_state:
+                if next_state == "GAME":
+                    self.states["GAME"] = GameState()
                 self.current_state = self.states[next_state]
+                self.current_state.on_enter()
             else:
                 self.running = False
 

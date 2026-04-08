@@ -11,6 +11,11 @@ class WelcomeState(BaseState):
         self.background = pygame.image.load("assets/kratos.jpg").convert()
         self.background = pygame.transform.scale(self.background, (1500, 800))
 
+    def on_enter(self):
+        pygame.mixer.music.load("assets/gamestate_music.mp3")
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.5)
+        
     def handle_events(self, events):
         for event in events:
             if event.type == pygame.QUIT:

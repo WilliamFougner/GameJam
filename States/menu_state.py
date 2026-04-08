@@ -15,7 +15,11 @@ class MenuState(BaseState):
         self.knfortsett = knapp(464, 369, 574, 136)
         self.knstopp = knapp(464, 587, 574, 136)
         
-
+    def on_enter(self):
+        pygame.mixer.music.load("assets/menu_music.mp3")
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.5)
+ 
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
 

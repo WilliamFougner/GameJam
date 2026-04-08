@@ -27,6 +27,11 @@ class GameState(BaseState):
         self.image = pygame.image.load("assets/bakgrunn.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (1500, 800))
 
+    def on_enter(self):
+        pygame.mixer.music.load("assets/gamestate_music.mp3")
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(1)
+        
     def handle_events(self, events : list[pygame.event.Event]):
         for event in events:
             if event.type == pygame.QUIT:

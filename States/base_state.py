@@ -21,6 +21,10 @@ class BaseState(ABC):
         self.next_state = None
         self.font = pygame.font.SysFont(None, 20)
 
+   
+    def on_enter(self):
+        pass
+    
     def draw_text(self, surface : pygame.Surface, string : str, font : pygame.font.Font, color : tuple, center : tuple):
         # Lager tekst. Andre parameter er anti-alias. Sett til True for glatt og fin tekst.
         text = font.render(string, False, color)
