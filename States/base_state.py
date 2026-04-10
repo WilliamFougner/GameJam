@@ -21,38 +21,23 @@ class BaseState(ABC):
         self.next_state = None
         self.font = pygame.font.SysFont(None, 20)
 
-   
     def on_enter(self):
-        pass
+        pass  # Kan overstyres i subklasser
     
     def draw_text(self, surface : pygame.Surface, string : str, font : pygame.font.Font, color : tuple, center : tuple):
-        # Lager tekst. Andre parameter er anti-alias. Sett til True for glatt og fin tekst.
+        # Lag tekst og plasser den på midten
         text = font.render(string, False, color)
-        # Henter rektangelet rundt teksten, med sentrum der man ønsker.
         text_rect = text.get_rect(center = center)
-        # Setter teksten på overflaten man spesifiserte.
         surface.blit(text, text_rect)
 
     @abstractmethod
     def handle_events(self, events : list[pygame.event.Event]):
-        """Håndterer events. Må implementeres av subklasser.
-        
-        Args:
-            events (list[pygame.event.Event]): En liste over pygame-events."""
         pass
 
     @abstractmethod
     def update(self, dt: float):
-        """Oppdaterer staten. Må implementeres av subklasser.
-        
-        Args:
-            dt (float): Tiden som har gått siden forrige oppdatering, i sekunder."""
         pass
 
     @abstractmethod    
     def draw(self, surface: pygame.Surface):
-        """Tegner staten. Må implementeres av subklasser.
-        
-        Args:
-            surface (pygame.Surface): Overflaten som skal tegnes på."""
         pass
